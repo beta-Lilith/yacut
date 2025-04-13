@@ -1,16 +1,14 @@
 from flask import jsonify, request
+from http import HTTPStatus
 
-from yacut import app, db
-from .error_handlers import InvalidAPIUsage
-from .models import MAX_SHORT_LENGTH, URLMap
-from .utils import get_unique_short_id, valid_short_id
+from . import app
+from .error_handlers import InvalidAPIUsage, URLException
+from .models import URLMap
 
 
 NO_REQUEST_DATA = 'Отсутствует тело запроса'
 NO_URL = '"url" является обязательным полем!'
-INVALID_SHORT_ID = 'Указано недопустимое имя для короткой ссылки'
-NOT_UNIQUE_SHORT_ID = 'Предложенный вариант короткой ссылки уже существует.'
-NO_SHORT_ID = 'Указанный id не найден'
+NO_SHORT = 'Указанный id не найден'
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -20,25 +18,19 @@ def create_url():
     data = request.get_json()
     if 'url' not in data:
         raise InvalidAPIUsage(NO_URL)
-    short_id = data.get('custom_id')
-    if not short_id:
-        short_id = get_unique_short_id()
-    if len(short_id) > MAX_SHORT_LENGTH:
-        raise InvalidAPIUsage(INVALID_SHORT_ID)
-    if not valid_short_id(short_id):
-        raise InvalidAPIUsage(INVALID_SHORT_ID)
-    if URLMap.query.filter_by(short=short_id).first():
-        raise InvalidAPIUsage(NOT_UNIQUE_SHORT_ID)
-    url_map = URLMap()
-    url_map.from_dict(dict(original=data['url'], short=short_id))
-    db.session.add(url_map)
-    db.session.commit()
-    return jsonify(url_map.to_dict()), 201
+    try:
+        url_map = URLMap.create(
+            original=data['url'],
+            short=data.get('custom_id')
+        )
+    except URLException as error:
+        raise InvalidAPIUsage(error.message)
+    return jsonify(url_map.to_dict()), HTTPStatus.CREATED
 
 
-@app.route('/api/id/<string:short_id>/', methods=['GET'])
-def get_original_url(short_id):
-    short_id_obj = URLMap.query.filter_by(short=short_id).first()
-    if not short_id_obj:
-        raise InvalidAPIUsage(NO_SHORT_ID, 404)
-    return jsonify({'url': short_id_obj.original}), 200
+@app.route('/api/id/<string:short>/', methods=['GET'])
+def get_original_url(short):
+    short_obj = URLMap.get_short(short)
+    if not short_obj:
+        raise InvalidAPIUsage(NO_SHORT, 404)
+    return jsonify({'url': short_obj.original}), HTTPStatus.OK

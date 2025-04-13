@@ -1,37 +1,59 @@
-Клонировать репозиторий и перейти в него в командной строке:
+# YACUT - СЕРВИС УКОРАЧИВАНИЯ ССЫЛОК
 
+## ТЕХНОЛОГИИ  
+- Python 3.9  
+- Flask 3.0  
+- SQLAlchemy 2.0  
+- Alembic 1.12  
+
+## ОПИСАНИЕ ПРОЕКТА  
+Проект YaCut — это сервис укорачивания ссылок. Его назначение — ассоциировать длинную пользовательскую ссылку с короткой, которую предлагает сам пользователь или предоставляет сервис.  
+Пользовательский интерфейс сервиса - одна страница с формой. Также доступен API для проекта.    
+
+## УСТАНОВКА И ЗАПУСК ПРОЕКТА  
+Клонировать репозиторий  
 ```
-git clone 
+git clone git@github.com:beta-Lilith/yacut
+```  
+Перейти в директорию проекта  
 ```
-
+cd yacut/  
+```  
+Создать и активировать виртуальное окружение, установить зависимости  
 ```
-cd yacut
+python -m venv venv
+```  
 ```
-
-Cоздать и активировать виртуальное окружение:
-
+. venv/Script/activate
+```  
 ```
-python3 -m venv venv
+pip install - r requirements.txt
+```  
+Создайте файл .env:  
 ```
+FLASK_APP=yacut
+FLASK_DEBUG=<1 или 0>
+DATABASE_URI=<подключение БД>
+SECRET_KEY=<ваш секретный ключ>
+```  
 
-* Если у вас Linux/macOS
-
-    ```
-    source venv/bin/activate
-    ```
-
-* Если у вас windows
-
-    ```
-    source venv/scripts/activate
-    ```
-
-Установить зависимости из файла requirements.txt:
-
+## РАБОТА С МИГРАЦИЯМИ  
+Создайте репозиторий:  
 ```
-python3 -m pip install --upgrade pip
+flask db init
+```  
+Создайте миграции:  
 ```
+flask db migrate -m "<ваш комментарий>"  
+```  
+Примените найденные изменения к базе данных:  
+```
+flask db upgrade
+```  
+Готово!  
 
-```
-pip install -r requirements.txt
-```
+## ДОКУМЕНТАЦИЯ к API  
+Файл `openapi.yaml`, можно просмотреть в онлайн-редакторе, например [Swagger Editor](https://editor.swagger.io/).  
+
+## АВТОР  
+Оскомова Ксения ([github](https://github.com/beta-Lilith))
