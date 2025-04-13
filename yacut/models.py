@@ -62,7 +62,7 @@ class URLMap(db.Model):
         if not URLMap.validate_short(short):
             raise ValidateShortError(INVALID_SHORT)
         if URLMap.get_short(short=short):
-            raise NotUniqueShortError(NOT_UNIQUE_SHORT, 400)
+            raise NotUniqueShortError(NOT_UNIQUE_SHORT)
         url_map = URLMap(original=original, short=short)
         db.session.add(url_map)
         db.session.commit()
