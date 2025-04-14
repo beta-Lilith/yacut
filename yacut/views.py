@@ -1,8 +1,9 @@
-from flask import abort, flash, redirect, render_template
 from http import HTTPStatus
 
+from flask import abort, flash, redirect, render_template
+
 from . import app
-from .error_handlers import URLException
+from .error_handlers import URLMapException
 from .forms import URLForm
 from .models import URLMap
 
@@ -16,19 +17,20 @@ def index_view():
         url_map = URLMap.create(
             original=form.original_link.data,
             short=form.custom_id.data,
+            validate=False,
         )
-    except URLException as error:
-        flash(error.message)
+    except URLMapException as error:
+        flash(error)
         return render_template('index.html', form=form), HTTPStatus.OK
     return render_template(
         'index.html',
         form=form,
-        short=url_map.get_short_url()), HTTPStatus.OK
+        short_url=url_map.get_short_url()), HTTPStatus.OK
 
 
 @app.route('/<string:short>', methods=['GET'])
 def redirect_view(short):
-    short_obj = URLMap.get_short(short)
-    if not short_obj:
+    short = URLMap.get(short)
+    if not short:
         abort(HTTPStatus.NOT_FOUND)
-    return redirect(short_obj.original), HTTPStatus.FOUND
+    return redirect(short.original), HTTPStatus.FOUND

@@ -1,10 +1,10 @@
-from flask import jsonify, request
 from http import HTTPStatus
 
-from . import app
-from .error_handlers import InvalidAPIUsage, URLException
-from .models import URLMap
+from flask import jsonify, request
 
+from . import app
+from .error_handlers import InvalidAPIUsage, URLMapException
+from .models import URLMap
 
 NO_REQUEST_DATA = 'Отсутствует тело запроса'
 NO_URL = '"url" является обязательным полем!'
@@ -23,14 +23,14 @@ def create_url():
             original=data['url'],
             short=data.get('custom_id')
         )
-    except URLException as error:
-        raise InvalidAPIUsage(error.message)
+    except URLMapException as error:
+        raise InvalidAPIUsage(str(error))
     return jsonify(url_map.to_dict()), HTTPStatus.CREATED
 
 
 @app.route('/api/id/<string:short>/', methods=['GET'])
 def get_original_url(short):
-    short_obj = URLMap.get_short(short)
-    if not short_obj:
+    short = URLMap.get(short)
+    if not short:
         raise InvalidAPIUsage(NO_SHORT, 404)
-    return jsonify({'url': short_obj.original}), HTTPStatus.OK
+    return jsonify({'url': short.original}), HTTPStatus.OK

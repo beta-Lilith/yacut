@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, URLField
-from wtforms.validators import DataRequired, Length, Regexp, Optional
+from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 from settings import ALLOWED_REGEXP, ORIGINAL_MAX_LENGTH, SHORT_MAX_LENGTH
 
@@ -8,6 +8,7 @@ ORIGINAL_COMMENT = 'Длинная ссылка'
 SHORT_COMMENT = 'Ваш вариант короткой ссылки'
 DATA_REQUIRED = 'Это обязательное поле'
 INVALID_SHORT = 'Указано недопустимое имя для короткой ссылки'
+SUBMIT = 'Создать'
 
 
 class URLForm(FlaskForm):
@@ -26,4 +27,4 @@ class URLForm(FlaskForm):
             Regexp(ALLOWED_REGEXP, message=INVALID_SHORT)
         ]
     )
-    submit = SubmitField('Создать')
+    submit = SubmitField(SUBMIT)

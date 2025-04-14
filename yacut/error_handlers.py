@@ -1,10 +1,32 @@
-from flask import jsonify, render_template
 from http import HTTPStatus
+
+from flask import jsonify, render_template
 
 from . import app, db
 
 
-class URLException(Exception):
+class URLMapException(Exception):
+    pass
+
+
+class ShortLenError(URLMapException):
+    pass
+
+
+class OriginalLenError(URLMapException):
+    pass
+
+
+class ValidateShortError(URLMapException):
+    pass
+
+
+class NotUniqueShortError(URLMapException):
+    pass
+
+
+class InvalidAPIUsage(Exception):
+
     status_code = HTTPStatus.BAD_REQUEST
 
     def __init__(self, message, status_code=None):
@@ -13,22 +35,8 @@ class URLException(Exception):
         if status_code is not None:
             self.status_code = status_code
 
-
-class InvalidAPIUsage(URLException):
     def to_dict(self):
         return dict(message=self.message)
-
-
-class ShortLenError(URLException):
-    pass
-
-
-class ValidateShortError(URLException):
-    pass
-
-
-class NotUniqueShortError(URLException):
-    pass
 
 
 @app.errorhandler(InvalidAPIUsage)

@@ -1,24 +1,19 @@
-from datetime import datetime
 import random
 import re
+from datetime import datetime
 
 from flask import url_for
 
+from settings import (ALLOWED_CHARS, ALLOWED_REGEXP, MAX_GEN_TRIES,
+                      ORIGINAL_MAX_LENGTH, REDIRECT_VIEW, SHORT_AUTO_LENGTH,
+                      SHORT_MAX_LENGTH)
+
 from . import db
-from .error_handlers import (
-    NotUniqueShortError,
-    ShortLenError,
-    ValidateShortError
-)
-from settings import (
-    ALLOWED_CHARS,
-    ALLOWED_REGEXP,
-    SHORT_AUTO_LENGTH,
-    ORIGINAL_MAX_LENGTH,
-    SHORT_MAX_LENGTH
-)
+from .error_handlers import (NotUniqueShortError, OriginalLenError,
+                             ShortLenError, ValidateShortError)
 
 INVALID_SHORT = 'Указано недопустимое имя для короткой ссылки'
+INVALID_ORIGINAL = 'Указано недопустимое имя для длинной ссылки'
 NOT_UNIQUE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
 
 
@@ -29,7 +24,7 @@ class URLMap(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     def get_short_url(self):
-        return url_for('redirect_view', short=self.short, _external=True)
+        return url_for(REDIRECT_VIEW, short=self.short, _external=True)
 
     def to_dict(self):
         return dict(
@@ -38,30 +33,29 @@ class URLMap(db.Model):
         )
 
     @staticmethod
-    def get_short(short):
+    def get(short):
         return URLMap.query.filter_by(short=short).first()
 
     @staticmethod
     def create_unique_short():
-        while True:
+        for _ in range(MAX_GEN_TRIES):
             short = ''.join(random.choices(ALLOWED_CHARS, k=SHORT_AUTO_LENGTH))
-            if short != URLMap.get_short(short):
+            if short != URLMap.get(short):
                 break
         return short
 
     @staticmethod
-    def validate_short(short):
-        return re.match(ALLOWED_REGEXP, short) is not None
-
-    @staticmethod
-    def create(original, short=None):
+    def create(original, short=None, validate=True):
         if not short:
             short = URLMap.create_unique_short()
-        if len(short) > SHORT_MAX_LENGTH:
-            raise ShortLenError(INVALID_SHORT)
-        if not URLMap.validate_short(short):
-            raise ValidateShortError(INVALID_SHORT)
-        if URLMap.get_short(short=short):
+        if validate:
+            if len(original) > ORIGINAL_MAX_LENGTH:
+                raise OriginalLenError(INVALID_ORIGINAL)
+            if len(short) > SHORT_MAX_LENGTH:
+                raise ShortLenError(INVALID_SHORT)
+            if not re.match(ALLOWED_REGEXP, short):
+                raise ValidateShortError(INVALID_SHORT)
+        if URLMap.get(short=short):
             raise NotUniqueShortError(NOT_UNIQUE_SHORT)
         url_map = URLMap(original=original, short=short)
         db.session.add(url_map)

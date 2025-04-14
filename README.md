@@ -36,24 +36,15 @@ FLASK_DEBUG=<1 или 0>
 DATABASE_URI=<подключение БД>
 SECRET_KEY=<ваш секретный ключ>
 ```  
-
-## РАБОТА С МИГРАЦИЯМИ  
-Создайте репозиторий:  
-```
-flask db init
-```  
-Создайте миграции:  
-```
-flask db migrate -m "<ваш комментарий>"  
-```  
-Примените найденные изменения к базе данных:  
+ 
+Примените найденные миграции:  
 ```
 flask db upgrade
 ```  
 Готово!  
 
 ## ДОКУМЕНТАЦИЯ к API  
-Файл `openapi.yaml`, можно просмотреть в онлайн-редакторе, например [Swagger Editor](https://editor.swagger.io/).  
+Файл `openapi.yaml`  
 
 ## АВТОР  
 Оскомова Ксения ([github](https://github.com/beta-Lilith))
