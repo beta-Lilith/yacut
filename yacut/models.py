@@ -9,12 +9,16 @@ from settings import (ALLOWED_CHARS, ALLOWED_REGEXP, MAX_GEN_TRIES,
                       SHORT_MAX_LENGTH)
 
 from . import db
-from .error_handlers import (NotUniqueShortError, OriginalLenError,
-                             ShortLenError, ValidateShortError)
+from .error_handlers import (FailedShortGen, NotUniqueShortError,
+                             OriginalLenError, ShortLenError,
+                             ValidateShortError)
 
 INVALID_SHORT = 'Указано недопустимое имя для короткой ссылки'
 INVALID_ORIGINAL = 'Указано недопустимое имя для длинной ссылки'
 NOT_UNIQUE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
+FAILED_SHORT_GEN = (
+    'Не удалось создать уникальную короткую ссылку. Попробуйте еще раз'
+)
 
 
 class URLMap(db.Model):
@@ -42,6 +46,7 @@ class URLMap(db.Model):
             short = ''.join(random.choices(ALLOWED_CHARS, k=SHORT_AUTO_LENGTH))
             if short != URLMap.get(short):
                 return short
+        raise FailedShortGen(FAILED_SHORT_GEN)
 
     @staticmethod
     def create(original, short=None, validate=True):

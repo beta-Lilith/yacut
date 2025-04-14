@@ -24,7 +24,7 @@ def create_url():
             short=data.get('custom_id')
         )
     except URLMapException as error:
-        raise InvalidAPIUsage(error.message)
+        raise InvalidAPIUsage(str(error))
     return jsonify(url_map.to_dict()), HTTPStatus.CREATED
 
 

@@ -6,10 +6,7 @@ from . import app, db
 
 
 class URLMapException(Exception):
-
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
+    pass
 
 
 class ShortLenError(URLMapException):
@@ -25,6 +22,10 @@ class ValidateShortError(URLMapException):
 
 
 class NotUniqueShortError(URLMapException):
+    pass
+
+
+class FailedShortGen(URLMapException):
     pass
 
 
