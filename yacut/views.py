@@ -30,7 +30,7 @@ def index_view():
 
 @app.route('/<string:short>', methods=['GET'])
 def redirect_view(short):
-    short = URLMap.get(short)
-    if not short:
+    url_map = URLMap.get(short)
+    if not url_map:
         abort(HTTPStatus.NOT_FOUND)
-    return redirect(short.original), HTTPStatus.FOUND
+    return redirect(url_map.original), HTTPStatus.FOUND

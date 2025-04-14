@@ -36,14 +36,14 @@ FLASK_DEBUG=<1 или 0>
 DATABASE_URI=<подключение БД>
 SECRET_KEY=<ваш секретный ключ>
 ```  
-Примените найденные миграции:  
+Примените миграции:  
 ```
 flask db upgrade
 ```  
 Готово!  
 
 ## ДОКУМЕНТАЦИЯ к API  
-Файл `openapi.yaml`  
+Доступна по адресу: http://127.0.0.1:5000/api/docs/  
 
 ## АВТОР  
 Оскомова Ксения ([github](https://github.com/beta-Lilith))

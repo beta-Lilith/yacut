@@ -41,22 +41,21 @@ class URLMap(db.Model):
         for _ in range(MAX_GEN_TRIES):
             short = ''.join(random.choices(ALLOWED_CHARS, k=SHORT_AUTO_LENGTH))
             if short != URLMap.get(short):
-                break
-        return short
+                return short
 
     @staticmethod
     def create(original, short=None, validate=True):
-        if not short:
-            short = URLMap.create_unique_short()
         if validate:
             if len(original) > ORIGINAL_MAX_LENGTH:
                 raise OriginalLenError(INVALID_ORIGINAL)
-            if len(short) > SHORT_MAX_LENGTH:
+            if short and len(short) > SHORT_MAX_LENGTH:
                 raise ShortLenError(INVALID_SHORT)
-            if not re.match(ALLOWED_REGEXP, short):
+            if short and not re.match(ALLOWED_REGEXP, short):
                 raise ValidateShortError(INVALID_SHORT)
-        if URLMap.get(short=short):
-            raise NotUniqueShortError(NOT_UNIQUE_SHORT)
+            if short and URLMap.get(short=short):
+                raise NotUniqueShortError(NOT_UNIQUE_SHORT)
+        if not short:
+            short = URLMap.create_unique_short()
         url_map = URLMap(original=original, short=short)
         db.session.add(url_map)
         db.session.commit()

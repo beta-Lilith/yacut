@@ -24,13 +24,13 @@ def create_url():
             short=data.get('custom_id')
         )
     except URLMapException as error:
-        raise InvalidAPIUsage(str(error))
+        raise InvalidAPIUsage(error.message)
     return jsonify(url_map.to_dict()), HTTPStatus.CREATED
 
 
 @app.route('/api/id/<string:short>/', methods=['GET'])
 def get_original_url(short):
-    short = URLMap.get(short)
-    if not short:
+    url_map = URLMap.get(short)
+    if not url_map:
         raise InvalidAPIUsage(NO_SHORT, 404)
-    return jsonify({'url': short.original}), HTTPStatus.OK
+    return jsonify({'url': url_map.original}), HTTPStatus.OK
