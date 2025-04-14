@@ -36,7 +36,6 @@ FLASK_DEBUG=<1 или 0>
 DATABASE_URI=<подключение БД>
 SECRET_KEY=<ваш секретный ключ>
 ```  
- 
 Примените найденные миграции:  
 ```
 flask db upgrade
